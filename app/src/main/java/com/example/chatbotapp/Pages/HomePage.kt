@@ -2,6 +2,8 @@ package com.example.chatbotapp.Pages
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,7 +52,7 @@ import com.example.chatbotapp.R
 @Composable
 fun HomePage(modifier: Modifier = Modifier,navController: NavController,authViewModel: AuthViewModel) {
     Column (modifier=Modifier){
-        AppHeader()
+        AppHeader(authViewModel)
         MessageList(modifier = Modifier.weight(1f),messageList = authViewModel.messageList)
         MessageInput(onMessageSend = {
             authViewModel.sendMessage(it)
@@ -61,20 +64,31 @@ fun HomePage(modifier: Modifier = Modifier,navController: NavController,authView
 
 @Composable
 
-fun  AppHeader(){
+fun  AppHeader(authViewModel: AuthViewModel){
     Box(modifier = Modifier
         .fillMaxWidth()
         .background(MaterialTheme.colorScheme.primary)){
-
+        Row (modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround){
             Text(text = "Chat Bot", modifier = Modifier.padding(16.dp),
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp)
+
+            Text(text = "Logout",
+                Modifier.clickable { authViewModel.SignOut() })
+
+        }
+
+
             
 
         }
         
-        
+
+
+
     }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,8 +107,11 @@ fun MessageInput(onMessageSend :  (String) -> Unit){
         )
 
 
-        IconButton(onClick = { onMessageSend(message)
-        message = ""}) {
+        IconButton(onClick = {
+            if (message.isNotEmpty()){
+            onMessageSend(message)
+        message = ""}
+        }) {
             Icon(imageVector = Icons.Default.Send, contentDescription ="Send" )
 
         }
@@ -136,7 +153,11 @@ fun MessageRow(messageModel: MessageModel){
                 .align(
                     if (isModel) Alignment.BottomStart else Alignment.BottomEnd
                 )){
-                Text(text = messageModel.message, fontWeight = FontWeight.W500)
+                SelectionContainer {
+                    Text(text = messageModel.message, fontWeight = FontWeight.W500)
+
+                }
+
             }
         }
     }
